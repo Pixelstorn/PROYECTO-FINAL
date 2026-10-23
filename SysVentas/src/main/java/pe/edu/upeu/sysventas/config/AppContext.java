@@ -4,6 +4,9 @@ import pe.edu.upeu.sysventas.controller.*;
 import pe.edu.upeu.sysventas.repository.*;
 import pe.edu.upeu.sysventas.service.*;
 import pe.edu.upeu.sysventas.service.impl.*;
+import pe.edu.upeu.sysventas.utils.ConsultaDNI;
+
+import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +41,14 @@ public class AppContext {
         registrar(MarcaRepository.class,         new MarcaRepository());
         registrar(UnidadMedidaRepository.class,  new UnidadMedidaRepository());
         registrar(ProductoRepository.class,      new ProductoRepository());
+
         registrar(UsuarioRepository.class, new UsuarioRepository());
+
+        registrar(ClienteRepository.class, new ClienteRepository());
+        registrar(VentCarritoRepository.class, new VentCarritoRepository());
+        registrar(VentaDetalleRepository.class, new VentaDetalleRepository());
+        registrar(VentaRepository.class, new VentaRepository());
+
 
     }
 
@@ -51,9 +61,17 @@ public class AppContext {
         registrar(IMarcaService.class,        new MarcaServiceImp(       getBean(MarcaRepository.class)));
         registrar(IProductoService.class,     new ProductoServiceImp(    getBean(ProductoRepository.class)));
         registrar(IUnidadMedidaService.class, new UnidadMedidaServiceImp(getBean(UnidadMedidaRepository.class)));
+
         registrar(IUsuarioService.class, new UsuarioServiceImp(getBean(UsuarioRepository.class)));
+
         registrar(IMenuMenuItemDao.class, new MenuMenuItemDaoImp());
 
+        registrar(ConsultaDNI.class, new ConsultaDNI());
+        DataSource ds = DatabaseConfig.getDataSource();
+        registrar(IClienteService.class, new ClienteServiceImp( getBean(ClienteRepository.class)));
+        registrar(IVentaCarritoService.class, new VentaCarritoServiceImp(getBean(VentCarritoRepository.class)));
+        registrar(IVentaDetalleService.class, new VentaDetalleServiceImp(getBean(VentaDetalleRepository.class)));
+        registrar(IVentaService.class, new VentaServiceImp( getBean(VentaRepository.class), ds));
 
     }
 
@@ -70,7 +88,19 @@ public class AppContext {
                         getBean(ICategoriaService.class),
                         getBean(IProductoService.class),
                         getBean(IUnidadMedidaService.class)));
+
         registrar(LoginController.class, new LoginController(getBean(IUsuarioService.class)));
+
+        registrar(VentaController.class,
+                new VentaController(
+                        getBean(IProductoService.class),
+                        getBean(IClienteService.class),
+                        getBean(IVentaCarritoService.class),
+                        getBean(IUsuarioService.class),
+                        getBean(IVentaService.class),
+                        getBean(IVentaDetalleService.class),
+                        getBean(ConsultaDNI.class)));
+
 
     }
 
